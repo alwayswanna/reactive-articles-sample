@@ -1,0 +1,61 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: reactive-sample-project
+  data:
+    mongodb:
+      authentication-database: admin
+      host: localhost
+      port: 27017
+      username: root
+      password: toor
+      database: article-storage
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      pollable-source: articleStatus
+      default-binder: rabbit
+      binders:
+        rabbit:
+          type: rabbit
+      rabbit:
+        bindings:
+          articleStatus-in-0:
+            consumer:
+              exchange-type: direct
+              binding-routing-key: article-status
+              transacted: true
+              auto-bind-dlq: true
+              dead-letter-queue-name: "article.article-status.dlq"
+          article-check-out-0:
+            producer:
+              exchange-type: direct
+              destination: article
+              binding-routing-key: article-check
+              routing-key-expression: '"article-check"'
+      bindings:
+        articleStatus-in-0:
+          group: article-status
+          destination: article
+        article-check-out-0:
+          destination: article
+      output-bindings: article-check
+
+
+springdoc:
+  server-urls:
+    - http://localhost:8085
+
+reactive:
+  fetch-data-before: 7
+  scheduler:
+    article-check-daily: 0 0 0 * * ?
+    article-check-monthly: 0 0 0 1 * ?
+  check-articles-interval-days: 2
+

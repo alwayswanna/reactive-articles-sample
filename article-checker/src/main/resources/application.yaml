@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: article-checker
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      pollable-source: articleCheck
+      default-binder: rabbit
+      binders:
+        rabbit:
+          type: rabbit
+      rabbit:
+        bindings:
+          articleCheck-in-0:
+            consumer:
+              exchange-type: direct
+              binding-routing-key: article-check
+              transacted: true
+              auto-bind-dlq: true
+              dead-letter-queue-name: "article.article-check.dlq"
+          article-status-out-0:
+            producer:
+              exchange-type: direct
+              binding-routing-key: article-status
+              destination: article
+              routing-key-expression: '"article-status"'
+      bindings:
+        articleCheck-in-0:
+          group: article-check
+          destination: article
+        article-status-out-0:
+          destination: article
+      output-bindings: article-status
+
+checker:
+  # Exclusion words that cannot be used in the article
+  dictionary-black-list-words:
+    - "whore"
+    - "slut"
+    - "fool"
+
+server:
+  port: 8090
