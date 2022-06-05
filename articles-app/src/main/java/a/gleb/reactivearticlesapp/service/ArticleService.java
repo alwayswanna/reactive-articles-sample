@@ -90,22 +90,16 @@ public class ArticleService {
      * @return {@link ApiResponseModel} with status of operation
      */
     public Mono<ApiResponseModel> remove(UUID articleId) {
-        return articleRepository.deleteById(articleId)
-                .flatMap(it -> {
-                    return Mono.just(
-                            ApiResponseModel.builder()
-                                    .status(OK)
-                                    .code("Success")
-                                    .description(String.format("Successfully remove article, with ID: %s", articleId))
-                                    .build());
-                })
-                .switchIfEmpty(
-                        Mono.just(
-                                ApiResponseModel.builder()
-                                        .status(CONFLICT)
-                                        .code("Failure")
-                                        .description(String.format("Failure remove article with ID: %s", articleId))
-                                        .build()));
+        articleRepository.deleteById(articleId)
+                .doOnError(e -> {
+                    log.warn("{}_error, can`t remove article with ID: {}", getClass().getSimpleName(), articleId);
+                });
+        return Mono.just(
+                ApiResponseModel.builder()
+                        .status(OK)
+                        .code("Success")
+                        .description(String.format("Successfully remove article, with ID: %s", articleId))
+                        .build());
     }
 
     /**

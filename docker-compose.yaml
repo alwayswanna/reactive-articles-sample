@@ -16,12 +16,3 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-
-  postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: auth-user
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: toor
-    ports:
-      - "5432:5432"
