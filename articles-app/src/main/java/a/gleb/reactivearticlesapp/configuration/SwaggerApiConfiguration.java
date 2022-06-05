@@ -4,6 +4,10 @@ import a.gleb.reactivearticlesapp.configuration.properties.OpenApiConfigurationP
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.OAuthFlow;
+import io.swagger.v3.oas.models.security.OAuthFlows;
+import io.swagger.v3.oas.models.security.Scopes;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -22,11 +28,29 @@ import java.util.Properties;
 @Slf4j
 @EnableConfigurationProperties(OpenApiConfigurationProperties.class)
 public class SwaggerApiConfiguration {
+    public static final String NAME_SECURITY_SCHEMA = "myOauth2Security";
 
     @Bean
-    public OpenAPI openAPI(OpenApiConfigurationProperties openApiConfigurationProperties) {
+    public OpenAPI openAPI(OpenApiConfigurationProperties properties) {
+        UriComponents tokenURL = UriComponentsBuilder.fromHttpUrl("http://localhost:9001")
+                .pathSegment("oauth2/token")
+                .build();
         return new OpenAPI()
-                .components(new Components())
+                .components(new Components()
+                        .addSecuritySchemes(NAME_SECURITY_SCHEMA,
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.OAUTH2)
+                                        .flows(
+                                                new OAuthFlows()
+                                                        .password(
+                                                                new OAuthFlow()
+                                                                        .tokenUrl(tokenURL.toString())
+                                                                        .refreshUrl(tokenURL.toString())
+                                                                        .scopes(new Scopes())
+                                                        )
+                                        )
+                        )
+                )
                 .info(
                         new Info()
                                 .title("reactive-sample-project")
@@ -34,7 +58,7 @@ public class SwaggerApiConfiguration {
                                 .termsOfService(StringUtils.EMPTY)
                                 .version(getBuildVersion())
                 )
-                .servers(getServers(openApiConfigurationProperties.getServerUrls()));
+                .servers(getServers(properties.getServerUrls()));
     }
 
 

@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: reactive-sample-project
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://localhost:8081
   data:
     mongodb:
       authentication-database: admin

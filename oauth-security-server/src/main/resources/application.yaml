@@ -1,0 +1,18 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: oauth-server
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: root
+    password: toor
+    url: jdbc:postgresql://localhost:5432/auth-user
+
+oauth:
+  issuerUrl: http://127.0.0.1:9001
+  defaultUsername: administrator
+  defaultPassword: administrator
+  defaultEmail: admin@example.com
+  clientSecret: the_secret

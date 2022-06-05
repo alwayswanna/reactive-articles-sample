@@ -22,10 +22,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
+import static a.gleb.reactivearticlesapp.controller.ArticleController.*;
+
 @Controller
 @RequestMapping("/api/v1")
 @AllArgsConstructor
-@Tag(name = ArticleController.ARTICLE_CONTROLLER_TAG)
+@Tag(name = ARTICLE_CONTROLLER_TAG)
 public class ArticleController {
 
     public static final String ARTICLE_CONTROLLER_TAG = "article.management.controller";

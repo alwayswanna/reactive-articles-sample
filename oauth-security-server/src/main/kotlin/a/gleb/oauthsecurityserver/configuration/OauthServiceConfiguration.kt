@@ -1,0 +1,10 @@
+package a.gleb.oauthsecurityserver.configuration
+
+import a.gleb.oauthsecurityserver.configuration.properties.OauthSecurityServerProperties
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Configuration
+
+@Configuration
+@EnableConfigurationProperties(OauthSecurityServerProperties::class)
+class OauthServiceConfiguration {
+}
