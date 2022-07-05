@@ -12,7 +12,15 @@ spring:
 
 oauth:
   issuerUrl: http://127.0.0.1:9001
-  defaultUsername: administrator
-  defaultPassword: administrator
-  defaultEmail: admin@example.com
-  clientSecret: the_secret
+  default-client:
+    default-client-id: message
+    default-client-secret: the_secret
+    default-access-token-time-to-live: 1 # hours
+    default-refresh-token-time-to-live: 90 # days
+    default-redirect-uris:
+      - "http://127.0.0.1:8081/authorized"
+      - "https://oauth.pstmn.io/v1/callback"
+  default-user:
+    default-username: administrator
+    default-password: administrator
+    default-email: admin@ya.ru

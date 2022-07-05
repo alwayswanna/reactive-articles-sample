@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
 import org.springframework.security.oauth2.core.oidc.OidcScopes
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
@@ -38,7 +40,7 @@ import java.security.interfaces.RSAPublicKey
 import java.time.Duration
 import java.util.*
 
-const val DEFAULT_CLIENT_ID = "default_client"
+const val DEFAULT_CLIENT_ID = "message"
 
 @Service
 class OauthConfiguration(
@@ -105,25 +107,36 @@ class OauthConfiguration(
         val client = RegisteredClient.withId(UUID.randomUUID().toString())
             .tokenSettings(
                 TokenSettings.builder()
-                    .accessTokenTimeToLive(Duration.ofHours(1))
-                    .refreshTokenTimeToLive(Duration.ofDays(90))
+                    .accessTokenTimeToLive(Duration.ofHours(properties.defaultClient.defaultAccessTokenTimeToLive))
+                    .refreshTokenTimeToLive(Duration.ofDays(properties.defaultClient.defaultRefreshTokenTimeToLive))
                     .build()
             )
-            .clientId(DEFAULT_CLIENT_ID)
-            .clientSecret(passwordEncoder.encode(properties.clientSecret))
+            .clientId(properties.defaultClient.defaultClientId)
+            .clientSecret(passwordEncoder.encode(properties.defaultClient.defaultClientSecret))
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
             .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .redirectUri("http://127.0.0.1:8081/authorized")
             .scope(OidcScopes.OPENID)
-            .build()
+
+        for (uri in properties.defaultClient.defaultRedirectUris){
+            client.redirectUri(uri)
+        }
+        val clientToSave = client.build()
 
         val registerClientRepository = JdbcRegisteredClientRepository(jdbcTemplate)
-        if (registerClientRepository.findByClientId(client.clientId) == null) {
-            registerClientRepository.save(client)
+        if (registerClientRepository.findByClientId(clientToSave.clientId) == null) {
+            registerClientRepository.save(clientToSave)
         }
         return registerClientRepository
+    }
+
+    @Bean
+    fun authorizationService(
+        jdbcTemplate: JdbcTemplate,
+        repository: RegisteredClientRepository
+    ): OAuth2AuthorizationService{
+        return JdbcOAuth2AuthorizationService(jdbcTemplate, repository)
     }
 
     @Bean
@@ -140,9 +153,9 @@ class OauthConfiguration(
     fun createDefaultUserAtStartUp(passwordEncoder: PasswordEncoder) = CommandLineRunner {
         val defaultAccount = Account(
             id = UUID.randomUUID(),
-            username = properties.defaultUsername,
-            password = passwordEncoder.encode(properties.defaultPassword),
-            email = properties.defaultEmail,
+            username = properties.defaultUser.defaultUsername,
+            password = passwordEncoder.encode(properties.defaultUser.defaultPassword),
+            email = properties.defaultUser.defaultEmail,
             enabled = true,
             roles = AccountRoles.ADMIN
         )

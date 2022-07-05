@@ -9,8 +9,22 @@ import org.springframework.validation.annotation.Validated
 @Validated
 data class OauthSecurityServerProperties(
     val issuerUrl: String,
+    val defaultClient: DefaultClient,
+    val defaultUser: DefaultUser
+)
+
+@ConstructorBinding
+data class DefaultUser(
     val defaultUsername: String,
     val defaultPassword: String,
-    val defaultEmail: String,
-    val clientSecret: String
+    val defaultEmail: String
+)
+
+@ConstructorBinding
+data class DefaultClient(
+    val defaultClientId: String,
+    val defaultClientSecret: String,
+    val defaultAccessTokenTimeToLive: Long,
+    val defaultRefreshTokenTimeToLive: Long,
+    val defaultRedirectUris: List<String>
 )

@@ -11,7 +11,6 @@
         <module>articles-app</module>
         <module>article-checker</module>
         <module>article-common</module>
-        <module>oauth-service</module>
         <module>oauth-security-server</module>
     </modules>
     <packaging>pom</packaging>
