@@ -19,7 +19,7 @@ oauth:
     default-refresh-token-time-to-live: 90 # days
     default-redirect-uris:
       - "http://127.0.0.1:8081/authorized"
-      - "https://oauth.pstmn.io/v1/callback"
+      - "http://127.0.0.1:8085/webjars/swagger-ui/index.html" # for redirect to Swagger of resource server
   default-user:
     default-username: administrator
     default-password: administrator

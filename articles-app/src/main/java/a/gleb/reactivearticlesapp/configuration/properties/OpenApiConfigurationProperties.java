@@ -14,4 +14,6 @@ public class OpenApiConfigurationProperties {
 
     @NotNull
     private List<String> serverUrls;
+    @NotNull
+    private String authorizationUrl;
 }

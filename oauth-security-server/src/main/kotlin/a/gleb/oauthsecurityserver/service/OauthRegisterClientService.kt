@@ -1,8 +1,9 @@
 package a.gleb.oauthsecurityserver.service
 
 import a.gleb.articlecommon.models.rest.ApiResponseModel
+import a.gleb.articlecommon.models.rest.ClientModel
 import a.gleb.articlecommon.models.rest.RegisterClientRequest
-import a.gleb.oauthsecurityserver.configuration.DEFAULT_CLIENT_ID
+import a.gleb.oauthsecurityserver.db.repository.CustomClientRegisteredRepository
 import a.gleb.oauthsecurityserver.exception.InvalidRegisterClientRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -18,6 +19,7 @@ import java.util.*
 
 @Service
 class OauthRegisterClientService(
+    var customRegisteredClientRepository: CustomClientRegisteredRepository,
     var registeredClientRepository: RegisteredClientRepository,
     var passwordEncoder: PasswordEncoder
 ) {
@@ -36,18 +38,22 @@ class OauthRegisterClientService(
                     .refreshTokenTimeToLive(Duration.ofDays(90))
                     .build()
             )
-            .clientId(DEFAULT_CLIENT_ID)
+            .clientId(registerClientRequest.clientId)
             .clientSecret(passwordEncoder.encode(registerClientRequest.clientSecret))
             .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
             .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
             .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
             .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .redirectUri(registerClientRequest.redirectedUri)
             .scope(OidcScopes.OPENID)
-            .build()
+
+
+        for (redirectUrl in registerClientRequest.redirectedUris){
+            client.redirectUri(redirectUrl)
+        }
+        var clientToSave = client.build()
 
         try {
-            registeredClientRepository.save(client)
+            registeredClientRepository.save(clientToSave)
         } catch (ex: Exception) {
             throw InvalidRegisterClientRequest(
                 "Error, can not create client with clientId ${registerClientRequest.clientId} , message: ${ex.message}")
@@ -59,4 +65,22 @@ class OauthRegisterClientService(
             .build()
     }
 
+    fun findAllClients() : List<ClientModel>{
+        val registeredClients = customRegisteredClientRepository.findAll()
+        if (registeredClients.isNotEmpty()){
+            return registeredClients.asSequence()
+                .map { registeredClient ->
+                    ClientModel.builder()
+                        .clientId(registeredClient.clientId)
+                        .redirectUris(registeredClient.redirectUris)
+                        .clientAuthenticationMethods(registeredClient
+                            .clientAuthenticationMethods.asSequence().map { it.value.toString() }.toSet())
+                        .clientAuthorizationGrantTypes(registeredClient
+                            .authorizationGrantTypes.asSequence().map { it.value.toString() }.toSet())
+                        .build()
+                }
+                .toList()
+        }
+        return emptyList();
+    }
 }

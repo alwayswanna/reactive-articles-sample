@@ -9,20 +9,18 @@ import io.swagger.v3.oas.models.security.OAuthFlows;
 import io.swagger.v3.oas.models.security.Scopes;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 @Configuration
 @Slf4j
@@ -31,7 +29,7 @@ public class SwaggerApiConfiguration {
     public static final String NAME_SECURITY_SCHEMA = "myOauth2Security";
 
     @Bean
-    public OpenAPI openAPI(OpenApiConfigurationProperties properties) {
+    public OpenAPI openAPI(OpenApiConfigurationProperties properties, BuildProperties buildProperties) {
         UriComponents tokenURL = UriComponentsBuilder.fromHttpUrl("http://localhost:9001")
                 .pathSegment("oauth2/token")
                 .build();
@@ -42,42 +40,23 @@ public class SwaggerApiConfiguration {
                                         .type(SecurityScheme.Type.OAUTH2)
                                         .flows(
                                                 new OAuthFlows()
-                                                        .password(
+                                                        .authorizationCode(
                                                                 new OAuthFlow()
+                                                                        .authorizationUrl(properties.getAuthorizationUrl())
                                                                         .tokenUrl(tokenURL.toString())
                                                                         .refreshUrl(tokenURL.toString())
-                                                                        .scopes(new Scopes())
+                                                                        .scopes(new Scopes()))
                                                         )
                                         )
                         )
-                )
                 .info(
                         new Info()
                                 .title("reactive-sample-project")
                                 .description("Spring boot reactive blog backend")
                                 .termsOfService(StringUtils.EMPTY)
-                                .version(getBuildVersion())
+                                .version(buildProperties.getVersion())
                 )
                 .servers(getServers(properties.getServerUrls()));
-    }
-
-
-    @SneakyThrows
-    private String getBuildVersion() {
-        InputStream ins = null;
-        try {
-            var properties = new Properties();
-            ins = getClass().getResourceAsStream("/META-INF/build-info.properties");
-            properties.load(ins);
-            return properties.getProperty("build.version");
-        } catch (Exception e) {
-            log.error("{}_error, can`t load resource with build.version", getClass().getSimpleName());
-        } finally {
-            if (ins != null) {
-                ins.close();
-            }
-        }
-        return StringUtils.EMPTY;
     }
 
     private List<Server> getServers(List<String> serverUrls) {

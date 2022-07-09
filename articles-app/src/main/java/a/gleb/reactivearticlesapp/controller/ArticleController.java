@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -22,7 +23,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-import static a.gleb.reactivearticlesapp.controller.ArticleController.*;
+import static a.gleb.reactivearticlesapp.configuration.SwaggerApiConfiguration.NAME_SECURITY_SCHEMA;
+import static a.gleb.reactivearticlesapp.controller.ArticleController.ARTICLE_CONTROLLER_TAG;
 
 @Controller
 @RequestMapping("/api/v1")
@@ -42,6 +44,7 @@ public class ArticleController {
      */
     @Operation(
             summary = "Create new article",
+            security = @SecurityRequirement(name = NAME_SECURITY_SCHEMA),
             tags = {ARTICLE_CONTROLLER_TAG}
     )
     @ApiResponses(
@@ -74,6 +77,7 @@ public class ArticleController {
      */
     @Operation(
             summary = "Edit existing article",
+            security = @SecurityRequirement(name = NAME_SECURITY_SCHEMA),
             tags = {ARTICLE_CONTROLLER_TAG}
     )
     @ApiResponses(
@@ -200,6 +204,7 @@ public class ArticleController {
      */
     @Operation(
             summary = "Remove selected article",
+            security = @SecurityRequirement(name = NAME_SECURITY_SCHEMA),
             tags = {ARTICLE_CONTROLLER_TAG}
     )
     @ApiResponses(

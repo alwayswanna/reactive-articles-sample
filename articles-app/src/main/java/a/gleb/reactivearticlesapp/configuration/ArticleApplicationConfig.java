@@ -17,32 +17,20 @@ public class ArticleApplicationConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-//    @Bean
-//    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .mvcMatcher("/**")
-//                .authorizeRequests()
-//                .mvcMatchers("/api/**").access("hasAuthority('SCOPE_message.read')")
-//                .and()
-//                .oauth2ResourceServer()
-//                .jwt();
-//        return http.build();
-//    }
-
     @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ArticleApplicationProperties properties) {
         JwtIssuerReactiveAuthenticationManagerResolver authenticationManagerResolver = new JwtIssuerReactiveAuthenticationManagerResolver
-                ("http://localhost:8081");
-//        http
-//                .authorizeExchange(exchanges ->
-//                        exchanges
-//                                .pathMatchers("/*", "/api/*").hasAnyAuthority()
-//                                .anyExchange().authenticated()
-//                )
-//                .oauth2ResourceServer(oauth2ResourceServer ->
-//                        oauth2ResourceServer
-//                                .authenticationManagerResolver(authenticationManagerResolver)
-//                );
-        return http.build();
+                ("http://localhost:9001");
+        return http
+                .cors().disable().csrf().disable()
+                .authorizeExchange(exchangeSpec -> {
+                    exchangeSpec.pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                            "/webjars/swagger-ui/**", "/actuator/**").permitAll();
+                    exchangeSpec.pathMatchers(properties.getAuthorizedPaths().toArray(String[]::new)).authenticated();
+                })
+                .oauth2ResourceServer(oAuth2ResourceServerSpec -> {
+                    oAuth2ResourceServerSpec.authenticationManagerResolver(authenticationManagerResolver);
+                })
+                .build();
     }
 }

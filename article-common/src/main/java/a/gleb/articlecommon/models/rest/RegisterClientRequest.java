@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +16,6 @@ public class RegisterClientRequest {
     private String clientId;
     @NotBlank
     private String clientSecret;
-    @NotBlank
-    private String redirectedUri;
+    @NotEmpty
+    private List<String> redirectedUris;
 }

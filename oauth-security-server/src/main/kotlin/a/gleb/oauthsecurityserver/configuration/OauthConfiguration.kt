@@ -40,7 +40,6 @@ import java.security.interfaces.RSAPublicKey
 import java.time.Duration
 import java.util.*
 
-const val DEFAULT_CLIENT_ID = "message"
 
 @Service
 class OauthConfiguration(
@@ -95,7 +94,7 @@ class OauthConfiguration(
     }
 
     @Bean
-    fun providerSettings(): ProviderSettings{
+    fun providerSettings(): ProviderSettings {
         return ProviderSettings.builder().issuer(properties.issuerUrl).build()
     }
 
@@ -119,7 +118,7 @@ class OauthConfiguration(
             .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
             .scope(OidcScopes.OPENID)
 
-        for (uri in properties.defaultClient.defaultRedirectUris){
+        for (uri in properties.defaultClient.defaultRedirectUris) {
             client.redirectUri(uri)
         }
         val clientToSave = client.build()
@@ -135,7 +134,7 @@ class OauthConfiguration(
     fun authorizationService(
         jdbcTemplate: JdbcTemplate,
         repository: RegisteredClientRepository
-    ): OAuth2AuthorizationService{
+    ): OAuth2AuthorizationService {
         return JdbcOAuth2AuthorizationService(jdbcTemplate, repository)
     }
 
@@ -159,7 +158,7 @@ class OauthConfiguration(
             enabled = true,
             roles = AccountRoles.ADMIN
         )
-        if (!accountRepository.findAccountByUsernameOrEmail(defaultAccount.username, defaultAccount.email).isPresent){
+        if (!accountRepository.findAccountByUsernameOrEmail(defaultAccount.username, defaultAccount.email).isPresent) {
             accountRepository.save(defaultAccount)
         }
     }
