@@ -2,8 +2,10 @@ package a.gleb.oauthsecurityserver.configuration
 
 import a.gleb.oauthsecurityserver.configuration.properties.OauthSecurityServerProperties
 import a.gleb.oauthsecurityserver.db.entity.Account
-import a.gleb.oauthsecurityserver.db.entity.AccountRoles
+import a.gleb.oauthsecurityserver.db.entity.AccountRoles.ADMIN
+import a.gleb.oauthsecurityserver.db.entity.AccountRoles.USER
 import a.gleb.oauthsecurityserver.db.repository.AccountRepository
+import a.gleb.oauthsecurityserver.service.AccountService
 import a.gleb.oauthsecurityserver.service.OauthUserDetailsService
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration
+import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.core.AuthorizationGrantType
@@ -30,6 +33,8 @@ import org.springframework.security.oauth2.server.authorization.client.Registere
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings
 import org.springframework.security.oauth2.server.authorization.config.TokenSettings
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
 import org.springframework.stereotype.Service
@@ -45,7 +50,8 @@ import java.util.*
 class OauthConfiguration(
     var properties: OauthSecurityServerProperties,
     var accountRepository: AccountRepository,
-    var oauthUserDetailsService: OauthUserDetailsService
+    var oauthUserDetailsService: OauthUserDetailsService,
+    var accountService: AccountService,
 ) {
 
     companion object {
@@ -62,6 +68,7 @@ class OauthConfiguration(
         }
     }
 
+
     @Bean
     @Order(-1)
     fun authServiceSecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
@@ -72,6 +79,7 @@ class OauthConfiguration(
         return httpSecurity.build()
     }
 
+
     @Bean
     @Order(2)
     fun defaultSecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
@@ -80,10 +88,15 @@ class OauthConfiguration(
         return httpSecurity.build()
     }
 
+
+    /**
+     * [PasswordEncoder] which will be crypt client secret, which saves in database.
+     */
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder()
     }
+
 
     @Bean
     fun authenticationProvider(passwordEncoder: PasswordEncoder): DaoAuthenticationProvider {
@@ -93,11 +106,21 @@ class OauthConfiguration(
         return provider
     }
 
+
+    /**
+     * Sets issuer uri in token.
+     */
     @Bean
     fun providerSettings(): ProviderSettings {
         return ProviderSettings.builder().issuer(properties.issuerUrl).build()
     }
 
+
+    /**
+     * Create default client, with default params if this client does not exist.
+     * @param passwordEncoder for crypt client secret.
+     * @param jdbcTemplate bean which work with database.
+     */
     @Bean
     fun registerClientRepository(
         jdbcTemplate: JdbcTemplate,
@@ -130,6 +153,12 @@ class OauthConfiguration(
         return registerClientRepository
     }
 
+
+    /**
+     * [Bean] for save sessions in database.
+     * @param jdbcTemplate current jdbc bean.
+     * @param repository repository which work with clients.
+     */
     @Bean
     fun authorizationService(
         jdbcTemplate: JdbcTemplate,
@@ -138,6 +167,10 @@ class OauthConfiguration(
         return JdbcOAuth2AuthorizationService(jdbcTemplate, repository)
     }
 
+
+    /**
+     * Using for generate JWT.
+     */
     @Bean
     fun jwkSource(): JWKSource<SecurityContext> {
         val keyPair: KeyPair = generateRsaKey()
@@ -148,6 +181,33 @@ class OauthConfiguration(
         return ImmutableJWKSet(jwkSet)
     }
 
+
+    /**
+     * Token customizer, adds roles [Account.roles] to token, for restrict rights on client systems.
+     */
+    @Bean
+    fun jwtCustomizer(): OAuth2TokenCustomizer<JwtEncodingContext?>? {
+        return OAuth2TokenCustomizer {
+            var principal = it!!.getPrincipal<Authentication?>()
+            var userRoles = principal.authorities
+                .asSequence()
+                .map { role -> role.authority.toString() }
+                .toList()
+            it.claims.claim(
+                "role",
+                userRoles
+            )
+            accountService.enrichJWTByUserInfo(principal.name)
+                .forEach { (key, value) -> it.claims.claim(key, value) }
+
+        }
+    }
+
+
+    /**
+     * [Bean] which create default user when authorization server is up,
+     * if user does not exist.
+     */
     @Bean
     fun createDefaultUserAtStartUp(passwordEncoder: PasswordEncoder) = CommandLineRunner {
         val defaultAccount = Account(
@@ -156,7 +216,7 @@ class OauthConfiguration(
             password = passwordEncoder.encode(properties.defaultUser.defaultPassword),
             email = properties.defaultUser.defaultEmail,
             enabled = true,
-            roles = AccountRoles.ADMIN
+            roles = ADMIN.name.plus(',').plus(USER.name)
         )
         if (!accountRepository.findAccountByUsernameOrEmail(defaultAccount.username, defaultAccount.email).isPresent) {
             accountRepository.save(defaultAccount)

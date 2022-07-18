@@ -1,6 +1,5 @@
 package a.gleb.reactivearticlesapp.configuration.properties;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -9,11 +8,7 @@ import java.util.List;
 
 @ConfigurationProperties("springdoc")
 @Validated
-@Data
-public class OpenApiConfigurationProperties {
-
-    @NotNull
-    private List<String> serverUrls;
-    @NotNull
-    private String authorizationUrl;
-}
+public record OpenApiConfigurationProperties(
+        @NotNull List<String> serverUrls,
+        @NotNull String authorizationUrl
+) {}

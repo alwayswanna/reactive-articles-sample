@@ -27,7 +27,7 @@ public class CheckArticleContentTask {
      */
     @Scheduled(cron = "${reactive.scheduler.article-check-daily}")
     public void processCheckArticleByLastDay() {
-        var onCheck = articleService.findArticlesIsAfter(properties.getCheckArticlesIntervalDays())
+        var onCheck = articleService.findArticlesIsAfter(properties.checkArticlesIntervalDays())
                 .map(modelMapper::toMqCheckRequest)
                 .toStream()
                 .toList();

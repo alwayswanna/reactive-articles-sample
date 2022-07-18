@@ -26,6 +26,7 @@ import java.util.List;
 @Slf4j
 @EnableConfigurationProperties(OpenApiConfigurationProperties.class)
 public class SwaggerApiConfiguration {
+
     public static final String NAME_SECURITY_SCHEMA = "myOauth2Security";
 
     @Bean
@@ -42,11 +43,12 @@ public class SwaggerApiConfiguration {
                                                 new OAuthFlows()
                                                         .authorizationCode(
                                                                 new OAuthFlow()
-                                                                        .authorizationUrl(properties.getAuthorizationUrl())
+                                                                        .authorizationUrl(properties.authorizationUrl())
                                                                         .tokenUrl(tokenURL.toString())
                                                                         .refreshUrl(tokenURL.toString())
-                                                                        .scopes(new Scopes()))
-                                                        )
+                                                                        .scopes(new Scopes()
+                                                                                .addString("openid", "openid")))
+                                                )
                                         )
                         )
                 .info(
@@ -56,7 +58,7 @@ public class SwaggerApiConfiguration {
                                 .termsOfService(StringUtils.EMPTY)
                                 .version(buildProperties.getVersion())
                 )
-                .servers(getServers(properties.getServerUrls()));
+                .servers(getServers(properties.serverUrls()));
     }
 
     private List<Server> getServers(List<String> serverUrls) {

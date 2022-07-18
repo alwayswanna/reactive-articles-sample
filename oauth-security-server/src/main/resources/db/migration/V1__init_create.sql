@@ -56,14 +56,14 @@ CREATE TABLE oauth2_registered_client
 
 create table accounts
 (
-    id         uuid         not null primary key,
-    username   varchar(30)  not null,
-    password   varchar(250) not null,
+    id         uuid             not null    primary key,
+    username   varchar(30)      not null,
+    password   varchar(250)     not null,
     first_name varchar(30),
     last_name  varchar(30),
-    email      varchar(30)  not null,
-    role       varchar(15)  not null,
-    enabled    boolean      not null
+    email      varchar(30)      not null,
+    role       varchar(30)      not null,
+    enabled    boolean          not null
 );
 
 create index on accounts(username);

@@ -23,7 +23,8 @@ class OauthUserDetailsService(
                     .username(it.username)
                     .password(it.password)
                     .disabled(!it.enabled)
-                    .authorities(SimpleGrantedAuthority(it.roles.name))
+                    .authorities(it.roles.split(',')
+                        .map { role -> SimpleGrantedAuthority(role) })
                     .build()
             }
             .orElseThrow { throw UsernameNotFoundException("User, with username: $username not found") }

@@ -10,6 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class ClientModel {
+
     private String clientId;
     private Set<String> redirectUris;
     private Set<String> clientAuthenticationMethods;

@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 @Validated
 public class RegisterClientRequest {
+
     @NotBlank
     private String clientId;
     @NotBlank

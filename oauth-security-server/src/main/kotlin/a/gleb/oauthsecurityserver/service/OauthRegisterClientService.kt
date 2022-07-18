@@ -24,7 +24,6 @@ class OauthRegisterClientService(
     var passwordEncoder: PasswordEncoder
 ) {
 
-
     fun createNewRegisteredClient(registerClientRequest: RegisterClientRequest): ApiResponseModel {
         var registerClientByClientId = registeredClientRepository.findByClientId(registerClientRequest.clientId);
         if (registerClientByClientId != null) {
@@ -47,7 +46,7 @@ class OauthRegisterClientService(
             .scope(OidcScopes.OPENID)
 
 
-        for (redirectUrl in registerClientRequest.redirectedUris){
+        for (redirectUrl in registerClientRequest.redirectedUris) {
             client.redirectUri(redirectUrl)
         }
         var clientToSave = client.build()
@@ -56,7 +55,8 @@ class OauthRegisterClientService(
             registeredClientRepository.save(clientToSave)
         } catch (ex: Exception) {
             throw InvalidRegisterClientRequest(
-                "Error, can not create client with clientId ${registerClientRequest.clientId} , message: ${ex.message}")
+                "Error, can not create client with clientId ${registerClientRequest.clientId} , message: ${ex.message}"
+            )
         }
 
         return ApiResponseModel.builder()
@@ -65,18 +65,23 @@ class OauthRegisterClientService(
             .build()
     }
 
-    fun findAllClients() : List<ClientModel>{
+
+    fun findAllClients(): List<ClientModel> {
         val registeredClients = customRegisteredClientRepository.findAll()
-        if (registeredClients.isNotEmpty()){
+        if (registeredClients.isNotEmpty()) {
             return registeredClients.asSequence()
                 .map { registeredClient ->
                     ClientModel.builder()
                         .clientId(registeredClient.clientId)
                         .redirectUris(registeredClient.redirectUris)
-                        .clientAuthenticationMethods(registeredClient
-                            .clientAuthenticationMethods.asSequence().map { it.value.toString() }.toSet())
-                        .clientAuthorizationGrantTypes(registeredClient
-                            .authorizationGrantTypes.asSequence().map { it.value.toString() }.toSet())
+                        .clientAuthenticationMethods(
+                            registeredClient
+                                .clientAuthenticationMethods.asSequence().map { it.value.toString() }.toSet()
+                        )
+                        .clientAuthorizationGrantTypes(
+                            registeredClient
+                                .authorizationGrantTypes.asSequence().map { it.value.toString() }.toSet()
+                        )
                         .build()
                 }
                 .toList()

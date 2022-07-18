@@ -1,13 +1,13 @@
 package a.gleb.reactivearticlesapp.service;
 
-import a.gleb.reactivearticlesapp.configuration.properties.ArticleApplicationProperties;
-import a.gleb.reactivearticlesapp.mapper.ModelMapper;
 import a.gleb.articlecommon.models.db.Article;
-import a.gleb.reactivearticlesapp.exception.DataAccessException;
 import a.gleb.articlecommon.models.rest.ApiResponseModel;
 import a.gleb.articlecommon.models.rest.ArticleCreateRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleResponseModel;
+import a.gleb.reactivearticlesapp.configuration.properties.ArticleApplicationProperties;
+import a.gleb.reactivearticlesapp.exception.DataAccessException;
+import a.gleb.reactivearticlesapp.mapper.ModelMapper;
 import a.gleb.reactivearticlesapp.repository.ArticleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +32,10 @@ public class ArticleService {
     private ArticleApplicationProperties articleApplicationProperties;
     private ModelMapper modelMapper;
 
+
     /**
      * Method for RestAPI, create new article
+     *
      * @param article from user request
      * @return {@link ApiResponseModel} which contains new article
      */
@@ -58,8 +60,10 @@ public class ArticleService {
                 );
     }
 
+
     /**
      * Method for RestAPI edit existing article
+     *
      * @param article article from user request;
      * @return {@link ApiResponseModel} with edited article
      */
@@ -84,8 +88,10 @@ public class ArticleService {
                 );
     }
 
+
     /**
      * Method for RestAPI which delete article by ID
+     *
      * @param articleId from user request
      * @return {@link ApiResponseModel} with status of operation
      */
@@ -102,8 +108,10 @@ public class ArticleService {
                         .build());
     }
 
+
     /**
      * Method for RestAPI which fetch article by ID
+     *
      * @param articleId from user request
      * @return {@link ApiResponseModel} with article
      */
@@ -127,8 +135,10 @@ public class ArticleService {
                         ));
     }
 
+
     /**
      * Method for RestAPI which fetch all articles
+     *
      * @return {@link ApiResponseModel} with all fetched articles
      */
     public Mono<ApiResponseModel> findAll() {
@@ -156,13 +166,15 @@ public class ArticleService {
                 );
     }
 
+
     /**
      * Method for RestAPI which fetch part of articles
+     *
      * @return {@link ApiResponseModel} with part of articles
      */
     public Mono<ApiResponseModel> fetchPartOfArticles() {
         LocalDateTime lastUpdate = LocalDateTime.now()
-                .minusDays(articleApplicationProperties.getFetchDataBefore());
+                .minusDays(articleApplicationProperties.fetchDataBefore());
         return articleRepository.findArticleByLastUpdateIsAfter(lastUpdate)
                 .collectList()
                 .flatMap(it -> {
@@ -187,8 +199,10 @@ public class ArticleService {
                 );
     }
 
+
     /**
      * Method for fetch articles for make every day verification
+     *
      * @param days from config
      */
     public Flux<Article> findArticlesIsAfter(int days) {
@@ -203,10 +217,11 @@ public class ArticleService {
                 });
     }
 
+
     /**
      * Method for fetch articles for make monthly verification
      */
-    public Flux<Article> findAllArticles(){
+    public Flux<Article> findAllArticles() {
         return articleRepository.findAll()
                 .doOnError(e -> {
                     log.warn("{}_error, can`t fetch all articles, message {}", getClass().getSimpleName(), e.getMessage());

@@ -13,6 +13,7 @@ import javax.persistence.Id
 @Entity(name = "oauth2_registered_client")
 @Data
 data class CustomRegisteredClient(
+
     @Id
     val id: String,
     val clientId: String,

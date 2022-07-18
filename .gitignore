@@ -23,3 +23,4 @@
 /oauth-service/mvnw.cmd
 /oauth-service/.mvn/
 /oauth-security-server/.mvn/
+/.idea/sonarlint/
