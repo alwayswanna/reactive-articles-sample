@@ -23,7 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-import static a.gleb.reactivearticlesapp.configuration.SwaggerApiConfiguration.NAME_SECURITY_SCHEMA;
+import static a.gleb.reactivearticlesapp.configuration.OpenApiConfig.NAME_SECURITY_SCHEMA;
 import static a.gleb.reactivearticlesapp.controller.ArticleController.ARTICLE_CONTROLLER_TAG;
 
 @Controller

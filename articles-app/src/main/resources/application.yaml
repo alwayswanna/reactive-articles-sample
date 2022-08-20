@@ -54,28 +54,30 @@ spring:
 
 
 springdoc:
-  authorization-url: http://localhost:9001/oauth2/authorize
-  server-urls:
-    - http://localhost:8085
-    - http://127.0.0.1:8085
   swagger-ui:
     oauth:
       client-id: message
       client-secret: the_secret
-    oauth2-redirect-url: http://127.0.0.1:8085/webjars/swagger-ui/index.html # redirect to Swagger with token
-    disable-swagger-default-url: true
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
 
-reactive:
+article-app:
   fetch-data-before: 7
   scheduler:
     article-check-daily: 0 0 0 * * ?
     article-check-monthly: 0 0 0 1 * ?
   check-articles-interval-days: 2
-  authorized-paths:
-    - /api/v1/*
-  roles:
-    - USER
+  security-constraints:
+    - roles:
+        - USER
+      security-collections:
+        - patterns:
+            - /api/v1/*
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /**
 
-logging:
-  level:
-    org.springdoc: trace

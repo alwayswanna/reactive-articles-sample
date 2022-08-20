@@ -23,9 +23,9 @@ import org.springframework.security.config.annotation.web.configuration.OAuth2Au
 import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.oauth2.core.AuthorizationGrantType
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod
-import org.springframework.security.oauth2.core.oidc.OidcScopes
+import org.springframework.security.oauth2.core.AuthorizationGrantType.*
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod.*
+import org.springframework.security.oauth2.core.oidc.OidcScopes.OPENID
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService
 import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository
@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
 import org.springframework.stereotype.Service
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.RSAPrivateKey
@@ -72,17 +73,28 @@ class OauthConfiguration(
     @Bean
     @Order(-1)
     fun authServiceSecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(httpSecurity)
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(
+            httpSecurity
+                .cors {
+                    val urlBasedCorsConfigurationSource = UrlBasedCorsConfigurationSource()
+                    urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.cors)
+                    it.configurationSource(urlBasedCorsConfigurationSource)
+                }
+        )
         httpSecurity.exceptionHandling { ex ->
             ex.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login"))
         }
         return httpSecurity.build()
     }
 
-
     @Bean
     @Order(2)
     fun defaultSecurityFilterChain(httpSecurity: HttpSecurity): SecurityFilterChain {
+        httpSecurity.cors {
+            val urlBasedCorsConfigurationSource = UrlBasedCorsConfigurationSource()
+            urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", properties.cors)
+            it.configurationSource(urlBasedCorsConfigurationSource)
+        }
         httpSecurity.authorizeHttpRequests { it.anyRequest().authenticated() }
             .formLogin(Customizer.withDefaults())
         return httpSecurity.build()
@@ -135,11 +147,15 @@ class OauthConfiguration(
             )
             .clientId(properties.defaultClient.defaultClientId)
             .clientSecret(passwordEncoder.encode(properties.defaultClient.defaultClientSecret))
-            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-            .scope(OidcScopes.OPENID)
+            .clientAuthenticationMethod(CLIENT_SECRET_BASIC)
+            .clientAuthenticationMethod(CLIENT_SECRET_POST)
+            .clientAuthenticationMethod(CLIENT_SECRET_JWT)
+            .clientAuthenticationMethod(PRIVATE_KEY_JWT)
+            .clientAuthenticationMethod(NONE)
+            .authorizationGrantType(AUTHORIZATION_CODE)
+            .authorizationGrantType(REFRESH_TOKEN)
+            .authorizationGrantType(CLIENT_CREDENTIALS)
+            .scope(OPENID)
 
         for (uri in properties.defaultClient.defaultRedirectUris) {
             client.redirectUri(uri)
@@ -199,7 +215,6 @@ class OauthConfiguration(
             )
             accountService.enrichJWTByUserInfo(principal.name)
                 .forEach { (key, value) -> it.claims.claim(key, value) }
-
         }
     }
 
