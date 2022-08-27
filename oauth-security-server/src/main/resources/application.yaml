@@ -1,0 +1,39 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: oauth-server
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: root
+    password: toor
+    url: jdbc:postgresql://localhost:5432/auth-user
+
+oauth:
+  issuerUrl: http://127.0.0.1:9001
+  default-client:
+    default-client-id: message
+    default-client-secret: the_secret
+    default-access-token-time-to-live: 1 # hours
+    default-refresh-token-time-to-live: 90 # days
+    default-redirect-uris:
+      - "http://127.0.0.1:8081/authorized"
+      - "http://127.0.0.1:8085/webjars/swagger-ui/index.html" # for redirect to Swagger of resource server
+      - "http://127.0.0.1:8085/webjars/swagger-ui/oauth2-redirect.html" # for redirect to Swagger of resource server
+  default-user:
+    default-username: administrator
+    default-password: administrator
+    default-email: admin@ya.ru
+  cors:
+    enabled: true
+    allowed-origins: "*"
+    allowed-origins-all: true
+    allowed-methods:
+      - "*"
+    allowed-headers:
+      - "*"
+
+logging:
+  level:
+    org.springframework.security: trace

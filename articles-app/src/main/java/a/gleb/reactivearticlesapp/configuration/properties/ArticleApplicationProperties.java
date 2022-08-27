@@ -3,19 +3,40 @@ package a.gleb.reactivearticlesapp.configuration.properties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-@ConfigurationProperties("reactive")
+@ConfigurationProperties("article-app")
 @Validated
-@Getter
-@Setter
-public class ArticleApplicationProperties {
+public record ArticleApplicationProperties(
+        @NotNull int fetchDataBefore,
+        @NotNull int checkArticlesIntervalDays,
+        @NotNull List<SecurityConstraint> securityConstraints
+) {
 
-    @NotNull
-    private int fetchDataBefore;
+    @Getter
+    @Setter
+    @ConstructorBinding
+    public static class SecurityConstraint {
 
-    @NotNull
-    private int checkArticlesIntervalDays;
+        @NotNull
+        List<SecurityCollections> securityCollections = new ArrayList<>();
+        @NotNull
+        private List<String> roles = new ArrayList<>();
+    }
+
+    @Getter
+    @Setter
+    @ConstructorBinding
+    public static class SecurityCollections {
+
+        @NotNull
+        private List<String> patterns = new ArrayList<>();
+        private List<String> methods = new ArrayList<>();
+    }
 }
+

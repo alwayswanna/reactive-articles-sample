@@ -25,9 +25,9 @@ public class CheckArticleContentTask {
     /**
      * Cron job which start every day and sent part of {@link Article} to verification
      */
-    @Scheduled(cron = "${reactive.scheduler.article-check-daily}")
+    @Scheduled(cron = "${article-app.scheduler.article-check-daily}")
     public void processCheckArticleByLastDay() {
-        var onCheck = articleService.findArticlesIsAfter(properties.getCheckArticlesIntervalDays())
+        var onCheck = articleService.findArticlesIsAfter(properties.checkArticlesIntervalDays())
                 .map(modelMapper::toMqCheckRequest)
                 .toStream()
                 .toList();
@@ -40,7 +40,7 @@ public class CheckArticleContentTask {
     /**
      * Cron job which start every month and sent all {@link Article} to verification
      */
-    @Scheduled(cron = "${reactive.scheduler.article-check-monthly}")
+    @Scheduled(cron = "${article-app.scheduler.article-check-monthly}")
     public void processCheckArticleByLastMonth() {
         var onCheck = articleService.findAllArticles()
                 .map(modelMapper::toMqCheckRequest)

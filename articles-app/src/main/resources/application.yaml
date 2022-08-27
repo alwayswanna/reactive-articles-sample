@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: reactive-sample-project
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://127.0.0.1:9001
   data:
     mongodb:
       authentication-database: admin
@@ -49,13 +54,30 @@ spring:
 
 
 springdoc:
-  server-urls:
-    - http://localhost:8085
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: the_secret
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
 
-reactive:
+article-app:
   fetch-data-before: 7
   scheduler:
     article-check-daily: 0 0 0 * * ?
     article-check-monthly: 0 0 0 1 * ?
   check-articles-interval-days: 2
+  security-constraints:
+    - roles:
+        - USER
+      security-collections:
+        - patterns:
+            - /api/v1/*
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /**
 

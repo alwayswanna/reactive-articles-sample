@@ -10,9 +10,8 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class MqCheckRequest {
-
-    public MqCheckRequest(){}
 
     @NotNull
     private UUID messageId;

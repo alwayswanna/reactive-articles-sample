@@ -16,6 +16,7 @@ public class MqArticleService {
 
     private final ArticleService articleService;
 
+
     /**
      * Remove article from database if {@link MqCheckResponse} status is FAILURE
      * @param message from article checker service

@@ -8,10 +8,10 @@
     <artifactId>reactive-articles-sample</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>oauth-server</module>
         <module>articles-app</module>
         <module>article-checker</module>
         <module>article-common</module>
+        <module>oauth-security-server</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.7</version>
+        <version>2.7.2</version>
         <relativePath/>
     </parent>
 
@@ -31,8 +31,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <testcontainers.version>1.17.2</testcontainers.version>
-        <spring.swagger.version>1.6.8</spring.swagger.version>
-        <spring-cloud.version>2021.0.2</spring-cloud.version>
+        <spring.swagger.version>1.6.9</spring.swagger.version>
+        <spring-cloud.version>2021.0.3</spring-cloud.version>
+        <spring-security-oauth2-authorization-server.version>0.3.1</spring-security-oauth2-authorization-server.version>
         <article-common.version>0.0.1-SNAPSHOT</article-common.version>
     </properties>
 
