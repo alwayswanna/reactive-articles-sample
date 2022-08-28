@@ -1,6 +1,6 @@
-package a.gleb.oauthsecurityserver.configuration
+package a.gleb.oauth2manager.configuration
 
-import a.gleb.oauthsecurityserver.configuration.properties.OauthSecurityServerProperties
+import a.gleb.oauth2manager.configuration.properties.SecurityConstraintsProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -8,12 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
-@EnableConfigurationProperties(OauthSecurityServerProperties::class)
-class OauthServiceConfiguration {
+@EnableConfigurationProperties(SecurityConstraintsProperties::class)
+class OAuth2ManagerConfig {
 
-    /**
-     * [PasswordEncoder] which will be crypt client secret, which saves in database.
-     */
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder(13)

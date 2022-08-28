@@ -39,9 +39,9 @@ spring:
 checker:
   # Exclusion words that cannot be used in the article
   dictionary-black-list-words:
-    - "whore"
-    - "slut"
-    - "fool"
+    - "tiger"
+    - "pig"
+    - "etc"
 
 server:
   port: 8090

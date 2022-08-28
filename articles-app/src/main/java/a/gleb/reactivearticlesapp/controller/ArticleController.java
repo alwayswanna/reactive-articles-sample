@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -65,8 +67,11 @@ public class ArticleController {
     )
     @ResponseBody
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ApiResponseModel> createNewArticle(@RequestBody @Valid ArticleCreateRequestModel article) {
-        return articleService.save(article);
+    public Mono<ApiResponseModel> createNewArticle(
+            @RequestBody @Valid ArticleCreateRequestModel article,
+            @AuthenticationPrincipal Authentication authentication
+    ) {
+        return articleService.save(article, authentication);
     }
 
     /**
@@ -98,8 +103,11 @@ public class ArticleController {
     )
     @ResponseBody
     @PutMapping(value = "/edit")
-    public Mono<ApiResponseModel> editArticle(@RequestBody @Valid ArticleRequestModel article) {
-        return articleService.editArticle(article);
+    public Mono<ApiResponseModel> editArticle(
+            @RequestBody @Valid ArticleRequestModel article,
+            @AuthenticationPrincipal Authentication authentication
+    ) {
+        return articleService.editArticle(article, authentication);
     }
 
     /**
@@ -225,8 +233,8 @@ public class ArticleController {
     )
     @ResponseBody
     @DeleteMapping(value = "/remove/{id}")
-    public Mono<ApiResponseModel> remove(@PathVariable UUID id) {
-        return articleService.remove(id);
+    public Mono<ApiResponseModel> remove(@PathVariable UUID id, @AuthenticationPrincipal Authentication authentication) {
+        return articleService.remove(id, authentication);
     }
 
 }

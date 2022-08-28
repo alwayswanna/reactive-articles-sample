@@ -16,9 +16,8 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
@@ -27,8 +26,14 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 @EnableWebFluxSecurity
 public class ArticleSecurityConfig {
 
-    private static List<String> DEFAULT_UNPROTECTED_PATTERNS = new ArrayList<>(Arrays.asList("/swagger-ui.html",
-            "/swagger-ui/**", "/v3/api-docs/**", "/webjars/swagger-ui/**", "/actuator/**"));
+    private static String[] DEFAULT_UNPROTECTED_PATTERNS =
+            {
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/webjars/swagger-ui/**",
+                    "/actuator/**"
+            };
 
 
     @Bean
@@ -55,7 +60,16 @@ public class ArticleSecurityConfig {
 
     private void restrictApiMethods(AuthorizeExchangeSpec exchangeSpec, ArticleApplicationProperties properties) {
 
-        exchangeSpec.pathMatchers(DEFAULT_UNPROTECTED_PATTERNS.toArray(String[]::new)).permitAll();
+        exchangeSpec.pathMatchers(
+                Stream
+                        .concat(
+                                Arrays.stream(DEFAULT_UNPROTECTED_PATTERNS),
+                                properties.unprotectedPatterns().stream())
+                        .toArray(size -> (String[]) Array.newInstance(
+                                DEFAULT_UNPROTECTED_PATTERNS.getClass().getComponentType(),
+                                size)
+                        )
+        ).permitAll();
 
         properties.securityConstraints().forEach(securityConstraint -> {
             var roles = securityConstraint.getRoles();
@@ -71,8 +85,6 @@ public class ArticleSecurityConfig {
                 });
             });
         });
-
-        exchangeSpec.anyExchange().authenticated();
     }
 
     private class SpringBootReactiveAuthConverter implements Converter<Jwt, Flux<GrantedAuthority>> {
