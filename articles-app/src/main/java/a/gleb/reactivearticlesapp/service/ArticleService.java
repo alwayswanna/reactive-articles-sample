@@ -1,16 +1,20 @@
 package a.gleb.reactivearticlesapp.service;
 
-import a.gleb.articlecommon.models.db.Article;
+import a.gleb.articlecommon.models.mq.AuthorChangeInfoEvent;
 import a.gleb.articlecommon.models.rest.ApiResponseModel;
 import a.gleb.articlecommon.models.rest.ArticleCreateRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleResponseModel;
 import a.gleb.reactivearticlesapp.configuration.properties.ArticleApplicationProperties;
+import a.gleb.reactivearticlesapp.db.entity.Article;
+import a.gleb.reactivearticlesapp.db.repository.ArticleRepository;
+import a.gleb.reactivearticlesapp.exception.AccessDeniedException;
 import a.gleb.reactivearticlesapp.exception.DataAccessException;
 import a.gleb.reactivearticlesapp.mapper.ModelMapper;
-import a.gleb.reactivearticlesapp.repository.ArticleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static a.gleb.reactivearticlesapp.service.ArticleAccessVerificationService.USERNAME_CLAIM;
+import static a.gleb.reactivearticlesapp.service.ArticleAccessVerificationService.USER_ID_CLAIM;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -31,16 +37,22 @@ public class ArticleService {
     private ArticleRepository articleRepository;
     private ArticleApplicationProperties articleApplicationProperties;
     private ModelMapper modelMapper;
+    private ArticleAccessVerificationService articleAccessVerificationService;
 
 
     /**
      * Method for RestAPI, create new article
+     * If something goes wrong throw {@link DataAccessException} with message.
      *
      * @param article from user request
      * @return {@link ApiResponseModel} which contains new article
      */
-    public Mono<ApiResponseModel> save(ArticleCreateRequestModel article) {
-        return articleRepository.save(modelMapper.toNewArticle(article))
+    public Mono<ApiResponseModel> save(ArticleCreateRequestModel article, Authentication authentication) {
+        var jwtPrincipal = (Jwt) authentication.getPrincipal();
+        var articleToSave = modelMapper.toNewArticle(article);
+        articleToSave.setAuthorId(UUID.fromString(jwtPrincipal.getClaim(USER_ID_CLAIM)));
+        articleToSave.setAuthorLogin(jwtPrincipal.getClaim(USERNAME_CLAIM));
+        return articleRepository.save(articleToSave)
                 .flatMap(it -> {
                     return Mono.just(
                             ApiResponseModel.builder()
@@ -49,26 +61,39 @@ public class ArticleService {
                                     .description(String.format("Successfully added new article, with ID: %s", it.getId()))
                                     .payload(List.of(modelMapper.toArticleResponseModel(it)))
                                     .build());
-                })
-                .switchIfEmpty(
-                        Mono.just(
-                                ApiResponseModel.builder()
-                                        .status(CONFLICT)
-                                        .code("Failure")
-                                        .description(String.format("Failure while add new article title: %s", article.getTitle()))
-                                        .build())
-                );
+                }).onErrorResume(e -> Mono.error(new DataAccessException(
+                        String.format(
+                                "%s, something wrong when save article: %s",
+                                getClass().getSimpleName(),
+                                article.getTitle()
+                        )
+                )));
     }
 
 
     /**
-     * Method for RestAPI edit existing article
+     * Method for RestAPI edit existing article.
+     * If something wrong throw {@link DataAccessException}.
+     * If the user is trying to edit a post that is not theirs throw {@link AccessDeniedException}.
      *
      * @param article article from user request;
      * @return {@link ApiResponseModel} with edited article
      */
-    public Mono<ApiResponseModel> editArticle(ArticleRequestModel article) {
-        return articleRepository.save(modelMapper.toArticle(article))
+    public Mono<ApiResponseModel> editArticle(ArticleRequestModel article, Authentication authentication) {
+        if (articleAccessVerificationService.isAllowable(authentication, articleRepository.findById(article.getId()))) {
+            return Mono.error(() -> new AccessDeniedException(
+                    String.format(
+                            "%s, you can not edit this article, %s",
+                            getClass().getSimpleName(),
+                            article.getTitle()
+                    )
+            ));
+        }
+        var jwtPrincipal = (Jwt) authentication.getPrincipal();
+        var articleToSaveInDatabaseAfterEdit = modelMapper.toArticle(article);
+        articleToSaveInDatabaseAfterEdit.setAuthorId(UUID.fromString(jwtPrincipal.getClaim(USER_ID_CLAIM)));
+        articleToSaveInDatabaseAfterEdit.setAuthorLogin(jwtPrincipal.getClaim(USERNAME_CLAIM));
+        return articleRepository.save(articleToSaveInDatabaseAfterEdit)
                 .flatMap(it -> {
                     return Mono.just(
                             ApiResponseModel.builder()
@@ -77,17 +102,33 @@ public class ArticleService {
                                     .description(String.format("Successfully edit article, with ID: %s", it.getId()))
                                     .payload(List.of(modelMapper.toArticleResponseModel(it)))
                                     .build());
-                })
-                .switchIfEmpty(
-                        Mono.just(
-                                ApiResponseModel.builder()
-                                        .status(CONFLICT)
-                                        .code("Failure")
-                                        .description(String.format("Failure edit article, with ID: %s", article.getId()))
-                                        .build())
-                );
+                }).onErrorResume(e -> Mono.error(new DataAccessException(
+                        String.format(
+                                "%s, error while edit existing article, %s",
+                                getClass().getSimpleName(),
+                                article.getTitle())
+                )));
     }
 
+
+    /**
+     * Method for RestAPI which delete article by ID
+     *
+     * @param articleId from user request
+     * @return {@link ApiResponseModel} with status of operation
+     */
+    public Mono<ApiResponseModel> remove(UUID articleId, Authentication authentication) {
+        articleRepository.deleteById(articleId)
+                .doOnError(e -> {
+                    log.warn("{}_error, can`t remove article with ID: {}", getClass().getSimpleName(), articleId);
+                });
+        return Mono.just(
+                ApiResponseModel.builder()
+                        .status(OK)
+                        .code("Success")
+                        .description(String.format("Successfully remove article, with ID: %s", articleId))
+                        .build());
+    }
 
     /**
      * Method for RestAPI which delete article by ID
@@ -227,5 +268,41 @@ public class ArticleService {
                     log.warn("{}_error, can`t fetch all articles, message {}", getClass().getSimpleName(), e.getMessage());
                     throw new DataAccessException("DataObjectAccessException, can not fetch all articles");
                 });
+    }
+
+
+    /**
+     * Handle event from oauth2-manager-service, and change all articles which related with author.
+     *
+     * @param event from oauth2-manager-service
+     * @return {@link Mono<Void>}
+     */
+    public Mono<Void> changeArticleInfo(AuthorChangeInfoEvent event) {
+        return articleRepository.findAllByAuthorId(event.getAccountId())
+                .map(article -> {
+                    article.setAuthorLogin(event.getNewUsername());
+                    article.setLastUpdate(event.getTimestamp());
+                    return article;
+                })
+                .map(articleRepository::save)
+                .doOnError(it -> {
+                    log.warn("{}_warn, error, while update article for user with accountId: {}, message: {}",
+                            getClass().getSimpleName(),
+                            event.getAccountId(),
+                            it.getMessage());
+                })
+                .then();
+    }
+
+    public Mono<Void> removeRelatedArticles(AuthorChangeInfoEvent event){
+        return articleRepository.findAllByAuthorId(event.getAccountId())
+                .map(article -> articleRepository.delete(article))
+                .doOnError(it -> {
+                    log.warn("{}_warn, error, while delete article for user with accountId: {}, message: {}",
+                            getClass().getSimpleName(),
+                            event.getAccountId(),
+                            it.getMessage());
+                })
+                .then();
     }
 }

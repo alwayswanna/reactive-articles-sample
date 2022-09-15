@@ -1,0 +1,74 @@
+server:
+  port: 8077
+  error:
+    include-binding-errors: always
+    include-message: always
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: message
+      client-secret: the_secret
+      use-pkce-with-authorization-code-grant: true
+  oAuthFlow:
+    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
+    tokenUrl: http://127.0.0.1:9001/oauth2/token
+
+oauth2-manager:
+  security-constraints:
+    - roles:
+        - USER
+      security-collections:
+        - patterns:
+            - /api/v1/account
+          methods:
+            - DELETE
+            - PUT
+    - roles:
+        - ADMIN
+      security-collections:
+        - patterns:
+            - /api/v1/support/**
+  security-exclusions:
+    - methods:
+        - POST
+      patterns:
+        - /api/v1/account
+
+spring:
+  application:
+    name: oauth2-manager
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          issuer-uri: http://127.0.0.1:9001
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: root
+    password: toor
+    url: jdbc:postgresql://localhost:5432/auth-user
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+  cloud:
+    stream:
+      default-binder: rabbit
+      rabbit:
+        bindings:
+          notify-out-0:
+            producer:
+              exchange-type: direct
+              binding-routing-key: notify-event
+              transacted: true
+              routing-key-expression: '''notify-event'''
+      binders:
+        rabbit:
+          type: rabbit
+      bindings:
+        notify-out-0:
+          destination: article
+      output-bindings: notify
+

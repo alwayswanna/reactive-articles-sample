@@ -1,10 +1,10 @@
 package a.gleb.reactivearticlesapp.mapper;
 
 import a.gleb.articlecommon.models.mq.MqCheckRequest;
-import a.gleb.articlecommon.models.db.Article;
 import a.gleb.articlecommon.models.rest.ArticleCreateRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleResponseModel;
+import a.gleb.reactivearticlesapp.db.entity.Article;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -19,11 +19,11 @@ import java.util.UUID;
 )
 public interface ModelMapper {
 
-    @Mapping(target = "author_id", ignore = true)
+    @Mapping(target = "authorId", ignore = true)
     @Mapping(target = "lastUpdate", expression = "java(localDataTime())")
     Article toArticle(ArticleRequestModel articleRequestModel);
 
-    @Mapping(target = "author_id", ignore = true)
+    @Mapping(target = "authorId", ignore = true)
     @Mapping(target = "lastUpdate", expression = "java(localDataTime())")
     @Mapping(target = "id", expression = "java(generateRandomUUID())")
     Article toNewArticle(ArticleCreateRequestModel articleCreateRequestModel);

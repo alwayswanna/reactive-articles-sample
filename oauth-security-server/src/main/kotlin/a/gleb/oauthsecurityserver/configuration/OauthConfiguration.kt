@@ -21,7 +21,6 @@ import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration
 import org.springframework.security.core.Authentication
-import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.core.AuthorizationGrantType.*
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod.*
@@ -98,15 +97,6 @@ class OauthConfiguration(
         httpSecurity.authorizeHttpRequests { it.anyRequest().authenticated() }
             .formLogin(Customizer.withDefaults())
         return httpSecurity.build()
-    }
-
-
-    /**
-     * [PasswordEncoder] which will be crypt client secret, which saves in database.
-     */
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder()
     }
 
 

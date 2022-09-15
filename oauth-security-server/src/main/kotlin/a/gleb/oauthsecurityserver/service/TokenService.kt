@@ -5,7 +5,7 @@ import a.gleb.oauthsecurityserver.exception.AccountNotFoundException
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 
-var logger = KotlinLogging.logger {  }
+var logger = KotlinLogging.logger { }
 
 @Service
 class AccountService(

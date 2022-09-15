@@ -19,6 +19,8 @@ oauth:
     default-refresh-token-time-to-live: 90 # days
     default-redirect-uris:
       - "http://127.0.0.1:8081/authorized"
+      - "http://127.0.0.1:8077/swagger-ui/index.html" # for redirect to Swagger of manager-service
+      - "http://127.0.0.1:8077/swagger-ui/oauth2-redirect.html" # for redirect to Swagger of manager-service
       - "http://127.0.0.1:8085/webjars/swagger-ui/index.html" # for redirect to Swagger of resource server
       - "http://127.0.0.1:8085/webjars/swagger-ui/oauth2-redirect.html" # for redirect to Swagger of resource server
   default-user:
@@ -33,7 +35,3 @@ oauth:
       - "*"
     allowed-headers:
       - "*"
-
-logging:
-  level:
-    org.springframework.security: trace

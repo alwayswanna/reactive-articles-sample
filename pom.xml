@@ -12,6 +12,7 @@
         <module>article-checker</module>
         <module>article-common</module>
         <module>oauth-security-server</module>
+        <module>oauth2-manager</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -27,6 +28,7 @@
 
     <properties>
         <java.version>17</java.version>
+        <kotlin.version>1.6.21</kotlin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
@@ -35,6 +37,9 @@
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <spring-security-oauth2-authorization-server.version>0.3.1</spring-security-oauth2-authorization-server.version>
         <article-common.version>0.0.1-SNAPSHOT</article-common.version>
+        <kotlin-logging-jvm.version>2.1.23</kotlin-logging-jvm.version>
+        <jackson-annotations.version>2.13.3</jackson-annotations.version>
+        <springdoc-openapi-ui.version>1.6.10</springdoc-openapi-ui.version>
     </properties>
 
     <dependencyManagement>
@@ -52,6 +57,41 @@
                 <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-authorization-server</artifactId>
+                <version>${spring-security-oauth2-authorization-server.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>${springdoc-openapi-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.microutils</groupId>
+                <artifactId>kotlin-logging-jvm</artifactId>
+                <version>${kotlin-logging-jvm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-webflux-ui</artifactId>
+                <version>${spring.swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>a.gleb</groupId>
+                <artifactId>article-common</artifactId>
+                <version>${article-common.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

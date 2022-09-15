@@ -1,4 +1,4 @@
-package a.gleb.articlecommon.models.db;
+package a.gleb.reactivearticlesapp.db.entity;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -13,10 +13,10 @@ import java.util.UUID;
 public class Article {
 
     private UUID id;
-    private UUID author_id;
+    private UUID authorId;
     private String title;
     private String description;
     private String body;
     private LocalDateTime lastUpdate;
-
+    private String authorLogin;
 }

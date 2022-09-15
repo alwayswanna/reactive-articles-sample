@@ -1,7 +1,7 @@
 package a.gleb.reactivearticlesapp.job;
 
-import a.gleb.articlecommon.models.db.Article;
 import a.gleb.reactivearticlesapp.configuration.properties.ArticleApplicationProperties;
+import a.gleb.reactivearticlesapp.db.entity.Article;
 import a.gleb.reactivearticlesapp.mapper.ModelMapper;
 import a.gleb.reactivearticlesapp.service.ArticleService;
 import lombok.AllArgsConstructor;

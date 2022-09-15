@@ -15,6 +15,7 @@ import java.util.List;
 public record ArticleApplicationProperties(
         @NotNull int fetchDataBefore,
         @NotNull int checkArticlesIntervalDays,
+        @NotNull List<String> unprotectedPatterns,
         @NotNull List<SecurityConstraint> securityConstraints
 ) {
 
