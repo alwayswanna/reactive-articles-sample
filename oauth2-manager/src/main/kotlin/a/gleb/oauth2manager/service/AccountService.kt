@@ -7,7 +7,6 @@ import a.gleb.articlecommon.models.rest.AccountModel
 import a.gleb.oauth2manager.db.entity.Account
 import a.gleb.oauth2manager.db.repository.AccountRepository
 import a.gleb.oauth2manager.exception.AccountExistingException
-import a.gleb.oauth2manager.exception.AccountValidationException
 import a.gleb.oauth2manager.exception.DataAccountAccessException
 import a.gleb.oauth2manager.mapper.AccountMapper
 import mu.KotlinLogging
@@ -51,13 +50,10 @@ class AccountService(
             throw AccountExistingException("Account with ID: $accountId, does not exist.")
         }
 
-        if (accountRepository.findAccountByUsername(accountEditModel.username).isPresent){
+        if (accountRepository.findAccountByUsername(accountEditModel.username).isPresent &&
+            accountOptionalFromDatabase.get().username != accountEditModel.username
+        ) {
             throw AccountExistingException("Account with username ${accountEditModel.username} already exists")
-        }
-
-        if (accountOptionalFromDatabase.get().username == accountEditModel.username) {
-            throw AccountValidationException(
-                "User try use previous username: old: [${accountOptionalFromDatabase.get().username}]")
         }
 
         val accountToSave = accountMapper.updateAccount(

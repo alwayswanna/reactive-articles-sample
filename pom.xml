@@ -89,6 +89,10 @@
                 <version>${jackson-annotations.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework.cloud.stream.app</groupId>
+                <artifactId>stream-applications-test-support</artifactId>
+            </dependency>
+            <dependency>
                 <groupId>a.gleb</groupId>
                 <artifactId>article-common</artifactId>
                 <version>${article-common.version}</version>

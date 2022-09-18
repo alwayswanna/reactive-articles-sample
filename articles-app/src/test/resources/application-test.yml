@@ -4,24 +4,6 @@ server:
 spring:
   application:
     name: reactive-sample-project
-  security:
-    oauth2:
-      resource-server:
-        jwt:
-          issuer-uri: http://127.0.0.1:9001
-  data:
-    mongodb:
-      authentication-database: admin
-      host: localhost
-      port: 27017
-      username: root
-      password: toor
-      database: article-storage
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
   cloud:
     stream:
       default-binder: rabbit
@@ -65,16 +47,6 @@ spring:
         article-check-out-0:
           destination: article
 
-springdoc:
-  swagger-ui:
-    oauth:
-      client-id: message
-      client-secret: the_secret
-      use-pkce-with-authorization-code-grant: true
-  oAuthFlow:
-    authorizationUrl: http://127.0.0.1:9001/oauth2/authorize
-    tokenUrl: http://127.0.0.1:9001/oauth2/token
-
 article-app:
   fetch-data-before: 7
   scheduler:
@@ -93,3 +65,15 @@ article-app:
             - /api/v1/edit
             - /api/v1/create
             - /api/v1/remove/*
+
+springdoc:
+  server-urls:
+    - http://localhost:8085
+
+reactive:
+  fetch-data-before: 7
+  scheduler:
+    article-check-daily: 0 0 0 * * ?
+    article-check-monthly: 0 0 0 1 * ?
+  check-articles-interval-days: 2
+

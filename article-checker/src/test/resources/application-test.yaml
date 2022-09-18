@@ -1,14 +1,12 @@
-server:
-  port: 8090
+checker:
+  dictionary-black-list-words:
+    - "virgin"
+    - "simp"
+    - "incel"
 
 spring:
   application:
     name: article-checker
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
   cloud:
     stream:
       default-binder: rabbit
@@ -37,10 +35,3 @@ spring:
           destination: article
         articleStatus-out-0:
           destination: article
-
-checker:
-  # Exclusion words that cannot be used in the article
-  dictionary-black-list-words:
-    - "tiger"
-    - "pig"
-    - "etc"

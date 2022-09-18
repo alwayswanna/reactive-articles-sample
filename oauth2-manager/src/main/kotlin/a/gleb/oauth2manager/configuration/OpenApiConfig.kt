@@ -12,8 +12,8 @@ const val NAME_SECURITY_SCHEME = "securitySchemeOauth2"
 
 @OpenAPIDefinition(
     info = Info(
-        title = "article-reactive-backend",
-        description = "API service for manage articles",
+        title = "oauth2-manager-backend",
+        description = "API service for manage account on Oauth2-server.",
         version = "v1"
     )
 )

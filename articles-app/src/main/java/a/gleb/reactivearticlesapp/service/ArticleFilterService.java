@@ -1,6 +1,7 @@
 package a.gleb.reactivearticlesapp.service;
 
 import a.gleb.articlecommon.models.mq.MqCheckResponse;
+import a.gleb.articlecommon.models.rest.ApiResponseModel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,19 +24,12 @@ public class ArticleFilterService {
      *
      * @param mqCheckResponse from article checker service
      */
-    public Mono<Void> filter(@Valid MqCheckResponse mqCheckResponse) {
+    public Mono<ApiResponseModel> filter(@Valid MqCheckResponse mqCheckResponse) {
         log.info("{}_info, receive message with ID: {}", getClass().getSimpleName(), mqCheckResponse.getMessageId());
-        if (FAILURE == mqCheckResponse.getStatus()) {
-            log.info("{}_info, clean up article with bad content, {}",
-                    getClass().getSimpleName(),
-                    mqCheckResponse.getMessageId()
-            );
-            articleService.remove(mqCheckResponse.getMessageId())
-                    .doOnError(it -> log.info("Error while remove article with ID: {}, message: {}",
-                            mqCheckResponse.getMessageId(),
-                            it.getMessage()
-                    ));
-        }
-        return Mono.empty().then();
+        return mqCheckResponse.getStatus() == FAILURE ?
+                articleService.remove(mqCheckResponse.getMessageId()).doOnError(it ->
+                        log.info("Error while remove article with ID: {}, message: {}",
+                                mqCheckResponse.getMessageId(),
+                                it.getMessage())) : Mono.empty();
     }
 }

@@ -19,7 +19,7 @@ class NotifierService(
      * relate with user, if user changed username.
      */
     fun notify(account: Account, eventType: EventType) {
-        var accountChangeEvent = AuthorChangeInfoEvent.builder()
+        val accountChangeEvent = AuthorChangeInfoEvent.builder()
             .timestamp(LocalDateTime.now())
             .accountId(account.id)
             .eventType(eventType)

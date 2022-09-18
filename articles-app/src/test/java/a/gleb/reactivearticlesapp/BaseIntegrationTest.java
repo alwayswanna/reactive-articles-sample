@@ -1,16 +1,16 @@
 package a.gleb.reactivearticlesapp;
 
-import org.jetbrains.annotations.NotNull;
+import a.gleb.reactivearticlesapp.security.WithMockedUser;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -19,31 +19,33 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Testcontainers
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = MOCK)
-@ContextConfiguration(initializers = BaseIntegrationTest.Initializer.class)
+@ActiveProfiles("test")
+@AutoConfigureWebTestClient
+@ExtendWith(SpringExtension.class)
+@WithMockedUser
 public abstract class BaseIntegrationTest {
 
     @Container
     public static MongoDBContainer MONGO_DB_CONTAINER = new MongoDBContainer("mongo:latest");
+    @Container
+    public static RabbitMQContainer RABBIT_MQ_CONTAINER = new RabbitMQContainer("rabbitmq:latest");
 
-    @BeforeAll
-    static void setUp() {
+
+    static {
         MONGO_DB_CONTAINER.start();
+        RABBIT_MQ_CONTAINER.start();
     }
 
-    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-        @Override
-        public void initialize(@NotNull ConfigurableApplicationContext applicationContext) {
-            MONGO_DB_CONTAINER.start();
-            TestPropertyValues.of(
-                    String.format("spring.data.mongodb.uri: %s", MONGO_DB_CONTAINER.getReplicaSetUrl())
-            ).applyTo(applicationContext);
-        }
+    @DynamicPropertySource
+    static void setDynamicProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", MONGO_DB_CONTAINER::getReplicaSetUrl);
+        registry.add("spring.data.mongodb.port", MONGO_DB_CONTAINER::getFirstMappedPort);
+        registry.add("spring.rabbitmq.host", RABBIT_MQ_CONTAINER::getHost);
+        registry.add("spring.rabbitmq.port", RABBIT_MQ_CONTAINER::getFirstMappedPort);
     }
 
     @AfterAll
-    static void shutdown(){
+    static void shutdown() {
         MONGO_DB_CONTAINER.stop();
     }
-
 }

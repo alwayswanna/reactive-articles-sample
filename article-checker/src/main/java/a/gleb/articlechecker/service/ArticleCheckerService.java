@@ -1,57 +1,60 @@
 package a.gleb.articlechecker.service;
 
 import a.gleb.articlechecker.configuration.properties.ArticleCheckerConfigurationProperties;
+import a.gleb.articlechecker.exception.ArticleCheckException;
 import a.gleb.articlecommon.models.mq.MqCheckRequest;
 import a.gleb.articlecommon.models.mq.MqCheckResponse;
-import a.gleb.articlecommon.models.mq.MqStatusCheck;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
-import javax.validation.Valid;
-
-import static java.util.Locale.ROOT;
+import static a.gleb.articlecommon.models.mq.MqStatusCheck.FAILURE;
+import static a.gleb.articlecommon.models.mq.MqStatusCheck.SUCCESS;
 
 @Service
 @Slf4j
 @AllArgsConstructor
 public class ArticleCheckerService {
 
-    private static final String ARTICLE_STATUS_OUT = "article-status-out-0";
-
     private final ArticleCheckerConfigurationProperties configurationProperties;
-    private final StreamBridge streamBridge;
-
+    private final Sinks.Many<MqCheckResponse> publisherToArticleStatusQueue;
 
     /**
      * Listener check contains or not article words from dictionary-black list;
      *
      * @param mqCheckRequest message from rabbit
      */
-    @RabbitListener(queues = "article.article-check")
-    public void receiveMessage(@Valid MqCheckRequest mqCheckRequest) {
+    public Mono<Void> receiveMessage(MqCheckRequest mqCheckRequest) {
         log.info("{}_info, start check article with ID: {}", getClass().getSimpleName(), mqCheckRequest.getMessageId());
-        var result = new MqCheckResponse();
-        result.setMessageId(mqCheckRequest.getMessageId());
+        return Mono.just(publisherToArticleStatusQueue.tryEmitNext(checkArticle(mqCheckRequest)))
+                .doOnError(it -> {
+                    log.info("ERROR WHILE PROCEED CHECK: {}", it.getMessage());
+                    Mono.error(new ArticleCheckException(it.getMessage()));
+                })
+                .then();
+    }
+
+
+    private MqCheckResponse checkArticle(MqCheckRequest mqCheckRequest) {
+        var mqResponse = new MqCheckResponse();
+        mqResponse.setMessageId(mqCheckRequest.getMessageId());
 
         configurationProperties.getDictionaryBlackListWords()
                 .stream()
-                .map(it -> it.toLowerCase(ROOT))
-                .forEach(it -> {
-                    if (mqCheckRequest.getDescription().toLowerCase(ROOT).contains(it) ||
-                            mqCheckRequest.getTitle().toLowerCase(ROOT).contains(it) ||
-                            mqCheckRequest.getPayload().toLowerCase(ROOT).contains(it)) {
-                        log.info("{}_info, article with ID: {}, contains black list word: {}",
-                                getClass().getSimpleName(), mqCheckRequest.getMessageId(), it);
-                        result.setStatus(MqStatusCheck.FAILURE);
+                .parallel()
+                .map(String::toLowerCase)
+                .forEach(exclusion -> {
+                    if (mqCheckRequest.getTitle().toLowerCase().contains(exclusion) ||
+                            mqCheckRequest.getPayload().toLowerCase().contains(exclusion) ||
+                            mqCheckRequest.getDescription().toLowerCase().contains(exclusion)) {
+                        mqResponse.setStatus(FAILURE);
                     } else {
-                        log.info("{}_info, article with ID: {}, success check", getClass().getSimpleName(), mqCheckRequest.getMessageId());
-                        result.setStatus(MqStatusCheck.SUCCESS);
+                        mqResponse.setStatus(SUCCESS);
                     }
-                    streamBridge.send(ARTICLE_STATUS_OUT, result);
-                    log.info("{}_info, end check article with ID: {}", getClass().getSimpleName(), mqCheckRequest.getMessageId());
                 });
+
+        return mqResponse;
     }
 }
