@@ -17,7 +17,7 @@ import static a.gleb.reactivearticlesapp.configuration.OpenApiConfig.NAME_SECURI
                 authorizationUrl = "${springdoc.oAuthFlow.authorizationUrl}"
                 , tokenUrl = "${springdoc.oAuthFlow.tokenUrl}", scopes = {
                 @OAuthScope(name = "openid", description = "openid scope")})))
-public class OpenApiConfig {
+public record OpenApiConfig() {
 
     public static final String NAME_SECURITY_SCHEMA = "myOauth2Security";
 }

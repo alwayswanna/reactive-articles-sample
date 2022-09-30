@@ -14,5 +14,4 @@ public class ArticleCheckerConfig {
     public Jackson2JsonMessageConverter converter() {
         return new Jackson2JsonMessageConverter();
     }
-
 }

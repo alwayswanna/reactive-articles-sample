@@ -32,10 +32,10 @@ public class ApiResponseModel {
     @NotNull
     private String description;
 
-    @Schema(required = false, description = "Additional attributes of response")
+    @Schema(description = "Additional attributes of response")
     private Map<String, String> attributes;
 
-    @Schema(required = false, description = "Article, if status is 200")
+    @Schema(description = "Article, if status is 200")
     private List<ArticleResponseModel> payload;
 
 }

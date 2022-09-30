@@ -1,8 +1,9 @@
-package a.gleb.reactivearticlesapp;
+package a.gleb.reactivearticlesapp.util;
 
+import a.gleb.articlecommon.models.mq.MqCheckResponse;
+import a.gleb.articlecommon.models.mq.MqStatusCheck;
 import a.gleb.articlecommon.models.rest.ArticleCreateRequestModel;
 import a.gleb.articlecommon.models.rest.ArticleRequestModel;
-import lombok.experimental.UtilityClass;
 
 import java.util.UUID;
 
@@ -25,5 +26,12 @@ public class ArticleUtility {
                 .description("Change description")
                 .body("Change payload")
                 .build();
+    }
+
+    public static MqCheckResponse buildResponseRabbit(UUID id, MqStatusCheck status){
+        var response =  new MqCheckResponse();
+        response.setMessageId(id);
+        response.setStatus(status);
+        return response;
     }
 }

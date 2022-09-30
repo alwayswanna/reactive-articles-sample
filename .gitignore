@@ -25,3 +25,4 @@
 /oauth-security-server/.mvn/
 /.idea/sonarlint/
 /oauth2-manager/.mvn/
+/article-checker/target/

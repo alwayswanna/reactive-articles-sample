@@ -5,25 +5,22 @@ import a.gleb.articlecommon.models.rest.ApiResponseModel;
 import a.gleb.articlecommon.models.rest.ArticleCreateRequestModel;
 import a.gleb.reactivearticlesapp.BaseIntegrationTest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
-import static a.gleb.reactivearticlesapp.ArticleUtility.*;
+import static a.gleb.reactivearticlesapp.util.ArticleUtility.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
-@ExtendWith(SpringExtension.class)
-@AutoConfigureWebTestClient
 class ArticleControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
 
     @Test
+    @DisplayName("Success create article.")
     void createArticleTest() {
         webTestClient.post()
                 .uri("/api/v1/create")
@@ -35,7 +32,8 @@ class ArticleControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void editExistingArticle(){
+    @DisplayName("Success edit article.")
+    void editExistingArticle() {
         var response = webTestClient.post()
                 .uri("/api/v1/create")
                 .accept(APPLICATION_JSON)
@@ -64,7 +62,8 @@ class ArticleControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void fetchArticleById(){
+    @DisplayName("Success find article by ID")
+    void fetchArticleById() {
         var response = webTestClient.post()
                 .uri("/api/v1/create")
                 .accept(APPLICATION_JSON)
@@ -97,7 +96,8 @@ class ArticleControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void fetchAllArticles(){
+    @DisplayName("Success get all articles")
+    void fetchAllArticles() {
         var response = webTestClient.get()
                 .uri("/api/v1/all")
                 .accept(APPLICATION_JSON)
@@ -109,9 +109,10 @@ class ArticleControllerTest extends BaseIntegrationTest {
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(SUCCESS_CODE, actual.getCode());
     }
-    
+
     @Test
-    void fetchArticlesByLastWeek(){
+    @DisplayName("Success fetch article by last week")
+    void fetchArticlesByLastWeek() {
         var response = webTestClient.get()
                 .uri("/api/v1/weekly")
                 .exchange()
@@ -124,7 +125,8 @@ class ArticleControllerTest extends BaseIntegrationTest {
     }
 
     @Test
-    void removeExistingArticle(){
+    @DisplayName("Success remove article")
+    void removeExistingArticle() {
         var response = webTestClient.post()
                 .uri("/api/v1/create")
                 .accept(APPLICATION_JSON)

@@ -52,16 +52,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -88,16 +91,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -123,16 +129,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -154,16 +163,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -185,16 +197,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -218,16 +233,19 @@ public class ArticleController {
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            description = "OK", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "OK", responseCode = "200",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "UNAUTHORIZED", responseCode = "401", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "UNAUTHORIZED", responseCode = "401",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     ),
                     @ApiResponse(
-                            description = "INTERNAL SERVER ERROR", responseCode = "500", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiResponseModel.class))
+                            description = "INTERNAL SERVER ERROR", responseCode = "500",
+                            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = ApiResponseModel.class))
                     )
             }
     )
@@ -236,5 +254,4 @@ public class ArticleController {
     public Mono<ApiResponseModel> remove(@PathVariable UUID id, @AuthenticationPrincipal Authentication authentication) {
         return articleService.remove(id, authentication);
     }
-
 }

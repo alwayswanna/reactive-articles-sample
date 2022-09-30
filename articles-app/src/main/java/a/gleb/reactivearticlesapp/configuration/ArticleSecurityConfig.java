@@ -79,10 +79,10 @@ public class ArticleSecurityConfig {
                     exchangeSpec.pathMatchers(patterns).hasAnyRole(roles.toArray(String[]::new));
                     return;
                 }
-                securityCollections.getMethods().forEach(method -> {
-                    exchangeSpec.pathMatchers(HttpMethod.valueOf(method), patterns)
-                            .hasAnyRole(roles.toArray(String[]::new));
-                });
+                securityCollections.getMethods().forEach(method ->
+                        exchangeSpec.pathMatchers(HttpMethod.valueOf(method), patterns)
+                                .hasAnyRole(roles.toArray(String[]::new))
+                );
             });
         });
     }
@@ -97,12 +97,12 @@ public class ArticleSecurityConfig {
             Stream<GrantedAuthority> rolesStream = Arrays.stream(
                             source.getClaims().get("role")
                                     .toString()
-                                    .replaceAll("\\[", "")
-                                    .replaceAll("\\]", "")
+                                    .replace("\\[", "")
+                                    .replace("\\]", "")
                                     .split(","))
                     .map(rolesWithSymbols -> rolesWithSymbols.replaceAll("\\W", EMPTY))
                     .map(role -> String.format(ROLE_PREFIX, role))
-                    .map(role -> new SimpleGrantedAuthority(role));
+                    .map(SimpleGrantedAuthority::new);
 
             return Flux.fromStream(
                     rolesStream
